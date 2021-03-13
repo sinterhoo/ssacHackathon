@@ -1,13 +1,14 @@
 const { pool } = require("../../../config/database");
 
 // index
-async function setData(newsUrl,newsTitle,press,time) {
+async function setData(newsUrl,newsTitle,press,time,img) {
   let sub = new Object();
   let main = [];
     sub['newsUrl'] = newsUrl;
       sub['newsTitle'] = newsTitle;
       sub['press'] = press;
       sub['time'] = time;
+      sub['img'] = img;
       main[0] = sub;
   return main[0];
 }

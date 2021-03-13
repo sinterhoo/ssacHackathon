@@ -68,13 +68,14 @@ exports.getVaccine = async function (req, res) {
     let name = [];
     let number = [];
     let main = [];
+
+    let count,allCount;
     
     try{
     (async() => {
       // 브라우저를 실행한다.
       // 옵션으로 headless모드를 끌 수 있다.
       const browser = await puppeteer.launch({
-        args: ['--no-sandbox','--disable-setuid-sandbox'],
         headless: false
       });
     
@@ -92,24 +93,26 @@ exports.getVaccine = async function (req, res) {
       // $에 cheerio를 로드한다.
       const $ = cheerio.load(content);
       // 복사한 리스트의 Selector로 리스트를 모두 가져온다.
-      const lists = $("#content > div.status > div > div > div:nth-child(2) > div > div.tab_box.on > div.tab_content.round1 > div.map");
+      const lists = $("#content > div.status > div > div > div:nth-child(2) > div > div.tab_box.on > div.tab_content.round1");
       // 모든 리스트를 순환한다.
       lists.each((index, list) => {
+        count = $(list).find("div.round_box > ul > li:nth-child(1) > span").text();
+        allCount = $(list).find("div.round_box > ul > li:nth-child(2) > span").text();
         // 각 리스트의 하위 노드중 선택한 이름에 해당하는 요소를 Selector로 가져와 텍스트값을 가져온다.
         for(let i=1;i<18;i++){
-            name[i-1] = $(list).find("div > p.city_"+i+".no_4 > span.name").text();
-            number[i-1] = $(list).find("div > p.city_"+i+".no_4 > span.result").text();
+            name[i-1] = $(list).find("div.map > div > p.city_"+i+".no_4 > span.name").text();
+            number[i-1] = $(list).find("div.map > div > p.city_"+i+".no_4 > span.result").text();
             if(i == 7){
-                name[i-1] = $(list).find("div > p.city_"+i+".no_3 > span.name").text();
-                number[i-1] = $(list).find("div > p.city_"+i+".no_3 > span.result").text();
+                name[i-1] = $(list).find("div.map > div > p.city_"+i+".no_3 > span.name").text();
+                number[i-1] = $(list).find("div.map > div > p.city_"+i+".no_3 > span.result").text();
             }
             if(i == 8){
-                name[i-1] = $(list).find("div > p.city_"+i+".no_1 > span.name").text();
-                number[i-1] = $(list).find("div > p.city_"+i+".no_1 > span.result").text();
+                name[i-1] = $(list).find("div.map > div > p.city_"+i+".no_1 > span.name").text();
+                number[i-1] = $(list).find("div.map > div > p.city_"+i+".no_1 > span.result").text();
             }
             if(i == 17){
-              name[i-1] = $(list).find("div > p.city_"+i+".no_3 > span.name").text();
-              number[i-1] = $(list).find("div > p.city_"+i+".no_3 > span.result").text();
+              name[i-1] = $(list).find("div.map > div > p.city_"+i+".no_3 > span.name").text();
+              number[i-1] = $(list).find("div.map > div > p.city_"+i+".no_3 > span.result").text();
           }
         }
         
@@ -123,6 +126,8 @@ exports.getVaccine = async function (req, res) {
       browser.close();
       return res.json({
           "result" : main,
+          "count" : count,
+          "allCount" : allCount,
           isSuccess: true,
           code: 1000,
           message: "도시별 접종 현황 조회 성공"
@@ -147,7 +152,6 @@ let turn,people,percent,total,contracts,astra,pfizer,novavax,moderna,janssen;
 try{
 (async() => {
   const browser = await puppeteer.launch({
-    args: ['--no-sandbox','--disable-setuid-sandbox'],
     headless: false
   });
 
@@ -215,12 +219,12 @@ exports.getNews = async function (req, res) {
     let newsTitle = [];
     let press = [];
     let time = [];
+    let newsImg =[];
     let sub = new Object();
     let main = [];
     try{
     (async() => {
       const browser = await puppeteer.launch({
-        args: ['--no-sandbox','--disable-setuid-sandbox'],
         headless: false
       });
     
@@ -241,6 +245,7 @@ exports.getNews = async function (req, res) {
         newsTitle[i-1] = $(list).find("#thumbnailNewsList > li:nth-child("+i+") > a > span.desc > em").text();
         press[i-1] = $(list).find("#thumbnailNewsList > li:nth-child("+i+") > a > span.desc > span.cate").text();
         time[i-1] = $(list).find("#thumbnailNewsList > li:nth-child("+i+") > a > span.desc > span.time.bar").text();
+        newsImg[i-1] = "https://news.kbs.co.kr"+$(list).find("#thumbnailNewsList > li:nth-child("+i+") > a > span.img-box > span.img-thum > span > img").attr("src");
         }
         
        
@@ -248,7 +253,7 @@ exports.getNews = async function (req, res) {
       });
       for(let i=0; i<8; i++){
         
-        main[i] = await dataDao.setData(newsUrl[i],newsTitle[i],press[i],time[i]);
+        main[i] = await dataDao.setData(newsUrl[i],newsTitle[i],press[i],time[i],newsImg[i]);
       }
 
       
@@ -282,7 +287,6 @@ exports.getInstructions = async function (req, res) {
         try{
         (async() => {
           const browser = await puppeteer.launch({
-            args: ['--no-sandbox','--disable-setuid-sandbox'],
             headless: false
           });
         
