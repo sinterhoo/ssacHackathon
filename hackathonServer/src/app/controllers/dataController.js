@@ -74,6 +74,7 @@ exports.getVaccine = async function (req, res) {
       // 브라우저를 실행한다.
       // 옵션으로 headless모드를 끌 수 있다.
       const browser = await puppeteer.launch({
+        args: ['--no-sandbox','--disable-setuid-sandbox'],
         headless: false
       });
     
@@ -103,9 +104,13 @@ exports.getVaccine = async function (req, res) {
                 number[i-1] = $(list).find("div > p.city_"+i+".no_3 > span.result").text();
             }
             if(i == 8){
-                name[i-1] = $(list).find("div > p.city_"+i+".no_2 > span.name").text();
-                number[i-1] = $(list).find("div > p.city_"+i+".no_2 > span.result").text();
+                name[i-1] = $(list).find("div > p.city_"+i+".no_1 > span.name").text();
+                number[i-1] = $(list).find("div > p.city_"+i+".no_1 > span.result").text();
             }
+            if(i == 17){
+              name[i-1] = $(list).find("div > p.city_"+i+".no_3 > span.name").text();
+              number[i-1] = $(list).find("div > p.city_"+i+".no_3 > span.result").text();
+          }
         }
         
       });
@@ -142,6 +147,7 @@ let turn,people,percent,total,contracts,astra,pfizer,novavax,moderna,janssen;
 try{
 (async() => {
   const browser = await puppeteer.launch({
+    args: ['--no-sandbox','--disable-setuid-sandbox'],
     headless: false
   });
 
@@ -214,6 +220,7 @@ exports.getNews = async function (req, res) {
     try{
     (async() => {
       const browser = await puppeteer.launch({
+        args: ['--no-sandbox','--disable-setuid-sandbox'],
         headless: false
       });
     
@@ -275,6 +282,7 @@ exports.getInstructions = async function (req, res) {
         try{
         (async() => {
           const browser = await puppeteer.launch({
+            args: ['--no-sandbox','--disable-setuid-sandbox'],
             headless: false
           });
         
